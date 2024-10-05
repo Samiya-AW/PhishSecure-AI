@@ -1,4 +1,4 @@
-# PhishSecureAI
+# PhishSecure AI
 AI solutions for defending against digital threats and enhancing online safety
 PhishSecure AI is an AI-powered web application that detects phishing emails by analyzing email content and URLs,
 providing users with detailed analysis and recommended actions to enhance their email security.
