@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.14"
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "formidable": "latest",
+    "openai": "latest",
+    "dotenv": "latest"
   }
 }
