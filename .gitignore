@@ -5,3 +5,9 @@
 
 # Directory for uploaded files
 uploads/
+
+# Environment Variables
+.env
+
+__pycache__/
+*.pyc

@@ -2,3 +2,4 @@ requests
 python-dotenv
 openai
 imaplib2
+Flask==2.3.2

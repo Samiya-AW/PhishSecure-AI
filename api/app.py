@@ -1,14 +1,34 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import os
 import imaplib
 import email
 from email import policy
 from email.parser import BytesParser
+import requests
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Replace with a secure key
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+@app.route('/')
+def home():
+    return jsonify(message="Hello, PhishSecure AI!")
+
+load_dotenv()
+vt_api_key = os.getenv('VT_API_KEY')
+gmail_user = os.getenv('GMAIL_USER')
+gmail_app_password = os.getenv('GMAIL_APP_PASSWORD')
+secret_key = os.getenv('SECRET_KEY')
+
+# Required for Vercel's serverless function
+if __name__ == "__main__":
+    app.run()
+
+
+app.secret_key = secret_key  # Replace with a secure key
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Max upload size: 16MB
 
@@ -210,14 +230,49 @@ def fetch_unread_emails():
 
 @app.route('/fetch-emails', methods=['GET'])
 def fetch_emails():
-    emails = fetch_unread_emails()
-    results = []
-    for msg in emails:
-        email_content = msg.get_body(preferencelist=('plain')).get_content()
-        analysis = analyze_email(email_content)
-        results.append({
-            'subject': msg['Subject'],
-            'from': msg['From'],
-            'analysis': analysis
-        })
-    return render_template('emails.html', results=results)
+    try:
+        # Connect to Gmail via IMAP
+        mail = imaplib.IMAP4_SSL('imap.gmail.com')
+        mail.login(gmail_user, gmail_app_password)
+        mail.select('inbox')  # Connect to inbox.
+
+        # Search for all emails
+        result, data = mail.search(None, 'ALL')
+        email_ids = data[0].split()
+
+        emails = []
+        for eid in email_ids:
+            result, msg_data = mail.fetch(eid, '(RFC822)')
+            if result == 'OK':
+                msg = email.message_from_bytes(msg_data[0][1], policy=policy.default)
+                subject = msg['subject']
+                from_ = msg['from']
+                body = ''
+                if msg.is_multipart():
+                    for part in msg.walk():
+                        if part.get_content_type() == 'text/plain':
+                            body += part.get_content()
+                else:
+                    body = msg.get_content()
+
+                # Analyze email
+                analysis = analyze_email(body)
+
+                emails.append({
+                    'subject': subject,
+                    'from': from_,
+                    'body': body,
+                    'analysis': analysis
+                })
+
+        mail.logout()
+
+        return render_template('fetch_emails.html', emails=emails)
+    except Exception as e:
+        print(f"Error fetching emails: {e}")
+        flash('An error occurred while fetching emails. Please try again later.')
+        return redirect('/')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
