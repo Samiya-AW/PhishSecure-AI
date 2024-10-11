@@ -12,12 +12,10 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+@app.route('/')
+def home():
+    return jsonify(message="Hello, PhishSecure AI!")
 
-# @app.route('/')
-# def home():
-#     return jsonify(message="Hello, PhishSecure AI!")
-
-# Expose the WSGI application for Vercel
 def handler(request, context):
     return app.full_dispatch_request()
 
@@ -184,8 +182,8 @@ def analyze_with_model(email_content):
         return {'is_phishing': False}
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
 def fetch_unread_emails():
