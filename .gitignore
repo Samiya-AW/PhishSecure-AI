@@ -1,1 +1,7 @@
 .DS_Store
+
+# PyCharm IDE settings
+.idea/
+
+# Directory for uploaded files
+uploads/
