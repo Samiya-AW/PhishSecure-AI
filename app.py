@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 import imaplib
 import email
@@ -11,14 +11,6 @@ from dotenv import load_dotenv
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-@app.route('/')
-def home():
-    return jsonify(message="Hello, PhishSecure AI!")
-
-def handler(request, context):
-    return app.full_dispatch_request()
-
 load_dotenv()
 vt_api_key = os.getenv('VT_API_KEY')
 gmail_user = os.getenv('GMAIL_USER')
@@ -182,8 +174,8 @@ def analyze_with_model(email_content):
         return {'is_phishing': False}
 
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 def fetch_unread_emails():
