@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PhishSecure AI</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <!-- Link to your custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Optional: Custom styles to enhance the appearance */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f8fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #007bff; /* Bootstrap primary color */
+            color: #ffffff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+        }
+
+        header p.lead {
+            font-size: 1.25rem;
+            color: #d1d1d1;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 40px 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .instructions p {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+
+        .result .alert {
+            margin-top: 20px;
+        }
+
+        footer {
+            background-color: #343a40;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* Spinner positioning */
+        .spinner-border {
+            margin-left: 10px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 576px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 20px 10px;
+            }
+        }
+
+        /* Additional Styles for Help Section */
+        .help-section {
+            margin-top: 40px;
+        }
+
+        .help-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .help-section .btn-group-toggle .btn {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .eml-note {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #dc3545; /* Bootstrap danger color */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PhishSecure AI</h1>
+        <p class="lead">Protecting you from phishing attacks with AI</p>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Instructions -->
+            <div class="instructions mb-4">
+                <p>Upload the email (.eml) file you suspect might be a phishing attempt below, and click "Analyze Email" to check its safety.</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-warning" role="alert">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <!-- Email Input Form -->
+            <form method="POST" enctype="multipart/form-data" id="upload-form">
+                <div class="form-group">
+                    <label for="email_file">Upload Email File (.eml):</label>
+                    <input type="file" class="form-control-file" id="email_file" name="email_file" accept=".eml" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="analyze-btn">
+                    <i class="fas fa-upload"></i> Analyze Email
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="spinner"></span>
+                </button>
+                <div class="eml-note">Upload only .eml files.</div>
+            </form>
+
+            <!-- Analysis Results -->
+            {% if analysis_result %}
+                <div class="result mt-5">
+                    {% if analysis_result.is_phishing %}
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Warning!</h4>
+                            <p>{{ analysis_result.verdict }}</p>
+                            <hr>
+                            <p><strong>Reasons:</strong></p>
+                            <ul>
+                                {% for reason in analysis_result.reasons %}
+                                    <li>{{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                            <p><strong>Recommendations:</strong> {{ analysis_result.recommendations }}</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success" role="alert">
+                            <h4 class="alert-heading"><i class="fas fa-check-circle"></i> All Clear!</h4>
+                            <p>{{ analysis_result.verdict }}</p>
+                            <hr>
+                            <p>{{ analysis_result.recommendations }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <!-- How to Save Emails as .eml Files Section -->
+            <div class="help-section">
+                <h2>How to Save Emails as .eml Files</h2>
+                <p>Select your email platform below to view step-by-step instructions on saving emails as .eml files.</p>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <button type="button" class="btn btn-outline-primary" data-toggle="collapse" data-target="#gmailInstructions" aria-expanded="false" aria-controls="gmailInstructions">
+                        <i class="fas fa-envelope"></i> Gmail
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-toggle="collapse" data-target="#outlookDesktopInstructions" aria-expanded="false" aria-controls="outlookDesktopInstructions">
+                        <i class="fas fa-briefcase"></i> Outlook (Desktop)
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-toggle="collapse" data-target="#appleMailInstructions" aria-expanded="false" aria-controls="appleMailInstructions">
+                        <i class="fas fa-apple-alt"></i> Apple Mail
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-toggle="collapse" data-target="#thunderbirdInstructions" aria-expanded="false" aria-controls="thunderbirdInstructions">
+                        <i class="fas fa-bolt"></i> Mozilla Thunderbird
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-toggle="collapse" data-target="#outlookWebInstructions" aria-expanded="false" aria-controls="outlookWebInstructions">
+                        <i class="fas fa-globe"></i> Outlook.com
+                    </button>
+                </div>
+
+                <!-- Gmail Instructions -->
+                <div class="collapse mt-3" id="gmailInstructions">
+                    <div class="card card-body">
+                        <h5>Saving Emails as .eml Files in Gmail (Web Interface)</h5>
+                        <ol>
+                            <li><strong>Open Gmail:</strong> Navigate to <a href="https://mail.google.com/" target="_blank">Gmail</a> and log in to your account.</li>
+                            <li><strong>Select the Email:</strong> Click on the email you wish to save to open it.</li>
+                            <li><strong>Access "Show Original":</strong>
+                                <ul>
+                                    <li>Click on the three vertical dots (<strong>⋮</strong>) located at the top-right corner of the email (next to the reply button).</li>
+                                    <li>Select <strong>"Show original"</strong> from the dropdown menu.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Download the Original Message:</strong>
+                                <ul>
+                                    <li>In the new window that opens, click on the <strong>"Download Original"</strong> button.</li>
+                                    <li>The email will be downloaded as a <strong>.eml</strong> file (e.g., <code>original_message.eml</code>).</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Outlook (Desktop) Instructions -->
+                <div class="collapse mt-3" id="outlookDesktopInstructions">
+                    <div class="card card-body">
+                        <h5>Saving Emails as .eml Files in Outlook (Desktop Application)</h5>
+                        <ol>
+                            <li><strong>Open Outlook:</strong> Launch the Outlook desktop application.</li>
+                            <li><strong>Select the Email:</strong> Click on the email you want to save.</li>
+                            <li><strong>Drag and Drop:</strong>
+                                <ul>
+                                    <li>Drag the selected email from Outlook and drop it onto your desktop or a specific folder in File Explorer.</li>
+                                    <li>This action will create a <strong>.msg</strong> file by default.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Convert .msg to .eml (If Necessary):</strong>
+                                <ul>
+                                    <li>Open the <strong>.msg</strong> file using an email client that supports .eml files (e.g., Mozilla Thunderbird).</li>
+                                    <li>Save the email with a <strong>.eml</strong> extension.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Alternative Method Using "Save As":</strong>
+                                <ul>
+                                    <li>Right-click on the desired email and select <strong>"Save As..."</strong>.</li>
+                                    <li>In the save dialog, choose the destination folder.</li>
+                                    <li>From the <strong>"Save as type"</strong> dropdown, select <strong>"Outlook Message Format (*.msg)"</strong>.</li>
+                                    <li>Click <strong>"Save"</strong>.</li>
+                                    <li>Use a third-party converter or email client to convert the .msg file to .eml.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <p><strong>Note:</strong> Outlook doesn't natively support saving emails directly as .eml files in some versions. Using third-party tools or email converters can simplify this process.</p>
+                    </div>
+                </div>
+
+                <!-- Apple Mail Instructions -->
+                <div class="collapse mt-3" id="appleMailInstructions">
+                    <div class="card card-body">
+                        <h5>Saving Emails as .eml Files in Apple Mail (macOS)</h5>
+                        <ol>
+                            <li><strong>Open Apple Mail:</strong> Launch the Mail application on your Mac.</li>
+                            <li><strong>Select the Email:</strong> Click on the email you wish to save.</li>
+                            <li><strong>Export the Email:</strong>
+                                <ul>
+                                    <li>Go to <strong>"File"</strong> in the menu bar.</li>
+                                    <li>Select <strong>"Save As..."</strong>.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Choose Format and Destination:</strong>
+                                <ul>
+                                    <li>In the save dialog, select <strong>"Raw Message Source"</strong> from the <strong>"Format"</strong> dropdown.</li>
+                                    <li>Choose the destination folder and ensure the file is saved with a <strong>.eml</strong> extension.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Save the File:</strong> Click <strong>"Save"</strong>.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Mozilla Thunderbird Instructions -->
+                <div class="collapse mt-3" id="thunderbirdInstructions">
+                    <div class="card card-body">
+                        <h5>Saving Emails as .eml Files in Mozilla Thunderbird</h5>
+                        <ol>
+                            <li><strong>Open Thunderbird:</strong> Launch Mozilla Thunderbird.</li>
+                            <li><strong>Select the Email:</strong> Click on the email you want to save.</li>
+                            <li><strong>Save the Email:</strong>
+                                <ul>
+                                    <li>Go to <strong>"File"</strong> in the menu bar.</li>
+                                    <li>Navigate to <strong>"Save As" &gt; "File..."</strong>.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Choose Destination:</strong>
+                                <ul>
+                                    <li>In the save dialog, navigate to your desired folder.</li>
+                                    <li>Ensure the <strong>"File name"</strong> ends with <strong>.eml</strong> (e.g., <code>email.eml</code>).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Save the File:</strong> Click <strong>"Save"</strong>.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Outlook.com (Web Interface) Instructions -->
+                <div class="collapse mt-3" id="outlookWebInstructions">
+                    <div class="card card-body">
+                        <h5>Saving Emails as .eml Files in Outlook.com (Web Interface)</h5>
+                        <ol>
+                            <li><strong>Open Outlook.com:</strong> Navigate to <a href="https://outlook.live.com/" target="_blank">Outlook.com</a> and log in to your account.</li>
+                            <li><strong>Select the Email:</strong> Click on the email you wish to save.</li>
+                            <li><strong>Print the Email:</strong>
+                                <ul>
+                                    <li>Click on the three horizontal dots (<strong>⋯</strong>) in the top-right corner of the email.</li>
+                                    <li>Select <strong>"Print"</strong>.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Save as PDF:</strong>
+                                <ul>
+                                    <li>In the print dialog, choose <strong>"Save as PDF"</strong> as the destination.</li>
+                                    <li>Save the email as a <strong>.pdf</strong> file.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Convert PDF to .eml (Optional):</strong>
+                                <ul>
+                                    <li>Use third-party tools or services to convert the saved PDF back to a <strong>.eml</strong> file if necessary.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <p><strong>Note:</strong> This method involves converting to PDF first. Using desktop email clients like Outlook or Thunderbird with your Outlook.com account can provide a more direct .eml saving method.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 CyberNexus. Prototype for Reasoning with o1 Hackathon.</p>
+    </footer>
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript for Spinner and Enhanced User Experience -->
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const spinner = document.getElementById('spinner');
+
+            // Show spinner and disable button
+            spinner.classList.remove('d-none');
+            analyzeBtn.disabled = true;
+        });
+
+        // Optional: Re-enable the button and hide spinner after form submission
+        // This requires the page to reload after submission.
+        // If using AJAX, you would handle this in the AJAX success callback.
+        window.onload = function() {
+            {% if analysis_result %}
+                const analyzeBtn = document.getElementById('analyze-btn');
+                const spinner = document.getElementById('spinner');
+                // Hide spinner and enable button after analysis is done
+                spinner.classList.add('d-none');
+                analyzeBtn.disabled = false;
+            {% endif %}
+        };
+    </script>
+</body>
+</html>

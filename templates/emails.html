@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PhishSecure AI - Fetched Emails</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <!-- Link to your custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>PhishSecure AI</h1>
+        <p class="lead">Analyzed Emails from Gmail Inbox</p>
+    </header>
+
+    <main>
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
+            {% if results %}
+                {% for email in results %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <strong>From:</strong> {{ email.from }}<br>
+                            <strong>Subject:</strong> {{ email.subject }}
+                        </div>
+                        <div class="card-body">
+                            {% if email.analysis.is_phishing %}
+                                <div class="alert alert-danger" role="alert">
+                                    <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Warning!</h4>
+                                    <p>{{ email.analysis.verdict }}</p>
+                                    <hr>
+                                    <p><strong>Reasons:</strong></p>
+                                    <ul>
+                                        {% for reason in email.analysis.reasons %}
+                                            <li>{{ reason }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    <p><strong>Recommendations:</strong> {{ email.analysis.recommendations }}</p>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-success" role="alert">
+                                    <h4 class="alert-heading"><i class="fas fa-check-circle"></i> All Clear!</h4>
+                                    <p>{{ email.analysis.verdict }}</p>
+                                    <hr>
+                                    <p>{{ email.analysis.recommendations }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    No unread emails found in your inbox.
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 CyberNexus. Prototype for Reasoning with o1 Hackathon.</p>
+    </footer>
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
