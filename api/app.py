@@ -13,9 +13,9 @@ from dotenv import load_dotenv
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-@app.route('/')
-def home():
-    return jsonify(message="Hello, PhishSecure AI!")
+# @app.route('/')
+# def home():
+#     return jsonify(message="Hello, PhishSecure AI!")
 
 # Expose the WSGI application for Vercel
 def handler(request, context):
