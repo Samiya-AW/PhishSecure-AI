@@ -17,15 +17,15 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 def home():
     return jsonify(message="Hello, PhishSecure AI!")
 
+# Expose the WSGI application for Vercel
+def handler(request, context):
+    return app.full_dispatch_request()
+
 load_dotenv()
 vt_api_key = os.getenv('VT_API_KEY')
 gmail_user = os.getenv('GMAIL_USER')
 gmail_app_password = os.getenv('GMAIL_APP_PASSWORD')
 secret_key = os.getenv('SECRET_KEY')
-
-# Required for Vercel's serverless function
-if __name__ == "__main__":
-    app.run()
 
 
 app.secret_key = secret_key  # Replace with a secure key
