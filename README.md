@@ -1,56 +1,82 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PhishSecure AI
+
+PhishSecure AI is an AI-powered web application that detects phishing emails by analyzing email content and URLs, providing users with detailed analysis and recommended actions to enhance their email security.
+
+## Features
+
+* Phishing detection through AI content analysis.
+* URL checking against known malicious databases.
+* User-friendly interface for email analysis.
+
+## Technology Used
+
+* OpenAI o1 Model
+* Python (Flask)
+* Gmail API
+* PhishTank API
+* Google Safe Browsing API
+* Frontend: HTML, CSS, JavaScript
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+* Python 3.11
+* Node.js
+* npm (Node Package Manager)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Samiya-AW/PhishSecure-AI.git
+   cd PhishSecure-AI
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## Learn More
+3. Install Node.js dependencies:
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Set up environment variables:
+   Create a `.env` file in the root directory and add the following variables:
+   ```env
+   VT_API_KEY=your_virustotal_api_key
+   GMAIL_USER=your_gmail_user
+   GMAIL_APP_PASSWORD=your_gmail_app_password
+   SECRET_KEY=your_flask_secret_key
+   OPENAI_API_KEY=your_openai_api_key
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Running the Application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Start the Flask server:
+   ```bash
+   python app.py
+   ```
 
-## Deploy on Vercel
+2. Start the Next.js development server:
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Open http://localhost:3000 in your browser to see the application.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# PhishSecure AI
-AI solutions for defending against digital threats and enhancing online safety
-PhishSecure AI is an AI-powered web application that detects phishing emails by analyzing email content and URLs,
-providing users with detailed analysis and recommended actions to enhance their email security.
+## Usage
 
-# Features:
-	Phishing detection through AI content analysis.
-	URL checking against known malicious databases.
-	User-friendly interface for email analysis.
+1. Upload the email (.eml) file you suspect might be a phishing attempt.
+2. Click "Analyze Email" to check its safety.
+3. View the analysis result and follow the recommended actions.
 
-# Technology Used:
-	OpenAI o1 Model
-	Python (Flask)
-	Gmail API
-	PhishTank API
-	Google Safe Browsing API
-	Frontend: HTML, CSS, JavaScript
->>>>>>> upstream/main
+## Contributing
+
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
+
+## License
+
+This project is licensed under the MIT License.
